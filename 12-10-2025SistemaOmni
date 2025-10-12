@@ -1,0 +1,73 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+// Se ha corregido el nombre de la clase para que no empiece con un número.
+@TeleOp(name = "OmniWheels Test")
+public class OmniWheelsTest extends LinearOpMode {
+
+    // Se declaran los motores de tracción como DcMotorEx para usar su funcionalidad extendida.
+    DcMotorEx rightFront;
+    DcMotorEx rightBack;
+    DcMotorEx leftFront;
+    DcMotorEx leftBack;
+
+    @Override
+    public void runOpMode() {
+        // Se inicializan los motores usando el mapa de hardware.
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        rightBack  = hardwareMap.get(DcMotorEx.class, "rightBack");
+        leftFront  = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftBack   = hardwareMap.get(DcMotorEx.class, "leftBack");
+
+        // Los motores de la izquierda deben ir en reversa para un movimiento de avance coherente.
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.REVERSE);
+        
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            
+            // Los valores del gamepad son -1.0 a 1.0. Se leen y se almacenan en variables.
+            // Se invierte powerX para que 'strafe' (movimiento lateral) se sienta más intuitivo.
+            double powerY = gamepad1.left_stick_y;
+            double powerX = -gamepad1.left_stick_x;
+            double rot = gamepad1.right_stick_x;
+            
+            // Fórmulas para calcular la potencia de cada motor en un sistema omnidireccional.
+            // Se suma o resta para lograr el movimiento deseado (hacia adelante, lateral, girar).
+            double RF = powerY - powerX - rot;
+            double RB = powerY + powerX - rot;
+            double LF = powerY + powerX + rot;
+            double LB = powerY - powerX + rot;
+            
+            // Se recortan los valores para que estén dentro del rango válido de -1.0 a 1.0.
+            RF = Range.clip(RF, -1, 1);
+            RB = Range.clip(RB, -1, 1); 
+            LF = Range.clip(LF, -1, 1); 
+            LB = Range.clip(LB, -1, 1); 
+            
+            // Se establece la potencia de cada motor.
+            rightFront.setPower(RF);
+            rightBack.setPower(RB);
+            leftFront.setPower(LF);
+            leftBack.setPower(LB);
+
+            // Muestra telemetría para depuración.
+            telemetry.addData("Status", "Running");
+            telemetry.addData("RightFront", "%.2f", RF);
+            telemetry.addData("RightBack", "%.2f", RB);
+            telemetry.addData("LeftFront", "%.2f", LF);
+            telemetry.addData("LeftBack", "%.2f", LB);
+            telemetry.update();
+
+        }
+    }
+}
