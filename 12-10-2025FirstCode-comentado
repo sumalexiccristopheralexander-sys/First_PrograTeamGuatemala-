@@ -1,0 +1,237 @@
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.util.Range;
+
+
+
+@TeleOp(name = "movimiento2controlesF")
+public class firstP2 extends LinearOpMode {
+
+    // Motores de tracción para sistema omnidireccional
+    private DcMotorEx rightFront, rightBack, leftFront, leftBack;
+
+    // Actuadores adicionales
+    private DcMotorEx motorHex;//Rotor(recolector)
+    private DcMotorEx motorHex2;//Rope
+    private DCMotorEx motorUltra;// acelerator 
+    private Servo servomotor2, servomotor3;//mecanismo recolector (Extensores)
+
+    // Variables de estado para los motores
+    private boolean hexToggleForward = false;//Función, establecer que gire el recolector/sentido horario (Falso/Quieto)
+    private boolean hexToggleReverse = false;//Función, establecer que gire el recolector/sentido antihorario (Falso/Quieto)
+    private boolean ultraForward = false;//Función, establecer que gire el acelerator/sentido horario (Falso/Quieto)
+    private boolean ultraReverse = false;//Función, establecer que gire el acelerator/sentido antihorario (Falso/Quieto)
+    private boolean hexForward = false;//Función, establecer que gire la Rope/sentido horario (Falso/Quieto)
+    private boolean hexReverse = false;//Función, establecer que gire la Rope/sentido antiohorario (Falso/Quieto)
+    
+    // Variables para detección de flancos (anti-rebote)
+    private boolean prevX, prevTriangle, prevSquare, prevCircle, prevCircle2, prevSquare2;
+
+    // Constantes de potencia
+    private static final double HEX_POWER = 1.0;//Establecer potencia, motor del recolector(Máximo)
+    private static final double HEX2_POWER = 1.0;//Establecer potencia, motor de la rope(Máximo)
+    private static final double ULTRA_POWER = 1.0;//Establecer potencia, motor del acelerator(Máximo)
+
+    private static final double Hex_Power = 0.4;//Establecer potencia, motor de la rope/para contrarestar peso(40%)
+
+    
+    //Posicion servos (adelante y atras)
+    private static final double SERVO_ADELANTE = 1.0;//Establecer posición de servo/continuo(1 = adelante)
+    private static final double SERVO_ATRAS = 0.0;//Establecer posición de servo/continuo(0 = atrás)
+    private static final double SERVO_PARAR = 0.5;//Establecer posición de servo/continuo(0.5 = parar)
+
+    
+    @Override
+    public void runOpMode() throws InterruptedException {
+        // Inicialización de hardware
+        //Indicar que las variables en el código estan escritos y declardos como son en el driver hub
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
+
+        motorHex = hardwareMap.get(DcMotorEx.class, "motorHex");
+        motorHex2 = hardwareMap.get(DcMotorEx.class, "motorHex2");
+        motorUltra = hardwareMap.get(DcMotorEx.class, "motorUltra");
+        servomotor1 = hardwareMap.get(Servo.class, "servomotor1"); 
+        servomotor2 = hardwareMap.get(Servo.class, "servomotor2");
+        servomotor3 = hardwareMap.get(Servo.class, "servomotor3");
+
+        // Configuración de comportamiento en cero
+        motorHex.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Inicializar motores en 0
+        motorHex2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Inicializar motores en 0
+        motorUltra.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//Inicializar motores en 0
+
+        // Configuración de dirección
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);//Cambiar direccion de motores para que tengan el funcionamiento adecuado en el sistema omni(invertir dirección)
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Iniciar servos
+        servomotor2.setPosition(SERVO_PARAR);//Inicializar servos en modo "Quietos"
+        servomotor3.setPosition(SERVO_PARAR);
+
+
+        telemetry.addLine("[OmniWheelsTest] Sistema listo. Pulse PLAY para iniciar.");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            // Lectura de joysticks
+            //Leer tanto eje "y" y "x" del joystik izquierdo(Movimiento derecha-izquierda y esquinas)
+            float powerY = -gamepad1.left_stick_y;
+            float powerX = gamepad1.left_stick_x;
+            //Leer el movimiento en eje "x" del joystik derecho (Movimiento Rotación)
+            float rot = gamepad1.right_stick_x;
+
+            // Lectura de botones
+            boolean x = gamepad2.cross;
+            boolean square = gamepad1.square;
+            boolean triangle = gamepad2.triangle;
+            boolean circle = gamepad1.circle;
+            boolean rb = gamepad2.right_bumper;
+            boolean lb = gamepad2.left_bumper;
+            boolean dpadLeft = gamepad2.dpad_left;
+            boolean dpadRight = gamepad2.dpad_right;
+            boolean circle2 = gamead2.circle;
+            boolean square2 = gamepad2.square;
+            float l2 = gamepad2.left_trigger;
+            float r2 = gamepad2.right_trigger;
+            
+
+
+            // Lógica movimiento omnidireccional
+
+            float RF = powerY - powerX - rot;//Ir hacia adelante y rotar a la izquierda
+            float RB = powerY + powerX - rot;//Ir hacia adelante y rotar a la izquierda
+            float LF = powerY + powerX + rot;//Ir hacia adelante y rotar a la derecha
+            float LB = powerY - powerX + rot;//Ir hacia adelante y rotar a la derecha
+
+            rightFront.setPower(Range.clip(RF, -1, 1));//Gira hacia atrás
+            rightBack.setPower(Range.clip(RB, -1, 1));//Gira hacia adelante
+            leftFront.setPower(Range.clip(LF, -1, 1));//Gira hacia atrás
+            leftBack.setPower(Range.clip(LB, -1, 1));//Gira hacia adelante
+
+            // Control de motorHex y servomotor1 
+            if (x && !prevX) { //Si se presiona x que se active(sin importar si sueltan el boton) Recolectar pelotas
+                hexToggleForward = !hexToggleForward;//Función, establecer que gire el recolector/sentido horario (Verdadero/Movimiento)
+                hexToggleReverse = false;//Función, establecer que gire el recolector/sentido antiohorario (Falso/Quieto) para evitar conflictos
+            }
+            if (triangle && !prevTriangle) {//Si se presiona triangulo que se active. Sacar pelotas
+                hexToggleReverse = !hexToggleReverse;//Función, establecer que gire el recolector/sentido antihorario (Verdadero/Movimiento)
+                hexToggleForward = false;//Evitar conflictos
+            }
+
+            if (hexToggleForward) {//Si la función es verdadera
+                motorHex.setPower(HEX_POWER);//Se activa motor/recolector(sentido horario)
+            } else if (hexToggleReverse) {//Si la función es verdadera
+                motorHex.setPower(-HEX_POWER);//Se activa motor/recolector(sentido antihorario)
+            } else {
+                motorHex.setPower(0);//De lo contrario permanecer "quieto"
+            }
+
+            //Rope
+            if (dpadLeft) {//Si se presiona la flecha izquierda(mientras se estre presionando)
+                motorHex2.setPower(HEX2_POWER);//Mover motor Rope sentido horario
+            } else if (dpadRight) {//Si se presiona la flecha derecha(mientras se estre presionando)
+                motorHex2.setPower(-HEX2_POWER);//Mover motor Rope sentido antihorario
+            } else {
+                motorHex2.setPower(0.0);//De lo contrario permanecer "Quieto"
+            }
+
+            //Para contrarestar el peso del robot (como un bloqueo)
+            if (circle2 && !prevCircle2){//Si se presiona circulo que se active(sin importar si sueltan el boton) Control 2
+                if(hexForward){
+                    hexForward = false;
+                } else {
+                    hexForward = true;//Función, establecer que gire la Rope/sentido horario (Verdadero/Movimiento)
+                    hexReverse = false;//Evitar conflictos (mantener en false)
+                }
+            }
+            if (square2 && !prevSquare2){//Si se presiona cuadrado que se active(sin importar si sueltan el boton) Control 2
+                if(hexReverse){
+                    hexReverse = false;
+                } else {
+                    hexReverse = true;//Función, establecer que gire la Rope/sentido antihorario (Verdadero/Movimiento)
+                    hexForward = false;//Evitar conflictos (mantener en false/apagado)
+                }
+            }
+            if (hexForward){//Si es verdadera/movimiento(adelante)
+                motorHex2.setPower(Hex_Power);//Activar motor Rope sentido horario 
+            } else if (hexReverse){//Si es verdadera/movimiento(atras)
+                motorHex2.setPower(-Hex_Power);//Activar motor Rope sentido antihorario 
+            } else{
+                motorHex2.setPower(0.0);//De lo contrario permanecer quieto
+            }
+
+            // acelerator xd
+            if (square && !prevSquare) {//Si se presiona circulo que se active(sin importar si sueltan el boton) Control 1
+                if (ultraForward) {
+                    ultraForward = false;
+                } else {
+                    ultraForward = true;//Función, establecer que gire el acelerator/sentido horario (Verdadero/Movimiento)
+                    ultraReverse = false;//Permanecer en false/Quieto
+                }
+            }
+            if (circle && !prevCircle) {
+                if (ultraReverse) {
+                    ultraReverse = false;
+                } else {
+                    ultraReverse = true;//Función, establecer que gire el acelerator/sentido antihorario (Verdadero/Movimiento)
+                    ultraForward = false;//Permanecer en false/quieto
+                }
+            }
+            if (ultraForward) {//Si es verdadera la funcion 
+                motorUltra.setPower(ULTRA_POWER);//Mover motor acelerator sentio horario
+            } else if (ultraReverse) {//Si es verdadera la funcion 
+                motorUltra.setPower(-ULTRA_POWER);//Mover motor acelerator sentido antihorario
+            } else {
+                motorUltra.setPower(0.0);//De lo contrario quedar quieto
+            }
+            
+            // Servo 1 y 2 
+            //Individual
+            if (lb) {//Mientras se presione l1 (se mantiene presionado)
+                servomotor3.setPosition(SERVO_ATRAS); //Servo izquierdo gira hacia adelante(dice atras porque se configuro al reves el servomotor)
+
+            } else if (rb) {//Mientras se presione r1
+                servomotor2.setPosition(SERVO_ADELANTE);//Servo derecho gira hacia adelante
+
+            } if (l2 > 0){//Mientras se presione l2 
+                servomotor3.setPosition(Servo_ADELANTE);//Servo izquiero gira hacia atras
+            } if (r2 > 0){//Mientras se presione r2
+                servomotor2.setPosition(Servo_ATRAS);//Servo derecho gira hacia atras
+            } 
+            if (lb && rb){//Mientras se presionen l1 y r1
+                servomotor3.setPosition(Servo_ATRAS0);  //Ambos giran hacia a delante
+                servomotor2.setPosition(Servo_ADELANTE);
+            } if ((l2 && r2) > 0){//Mientras se presionen l2 y r2 
+                sermovotor3.setPosition(Servomotor_ADELANTE); //Ambos giran hacia atras
+                sevomotror2.setPosition(Servomotor_ATRAS)
+            }else {
+                servomotor2.setPosition(SERVO_PARAR);// De lo contrario permanecen quietos
+                servomotor3.setPosition(SERVO_PARAR);
+            }
+            
+            //Regresa el valor a los botones
+            prevX = x;
+            prevTriangle = triangle;
+            prevSquare = square;
+            prevCircle = circle;
+
+            //Imprime que se hace en el Driver...
+            telemetry.addData("MotorHex (X/Tri)", hexToggleForward ? "Adelante" : (hexToggleReverse ? "Atras" : "Detenido"));
+            telemetry.addData("Servo 1 (Continuo)", hexToggleForward ? "Atras" : (hexToggleReverse ? "Adelante" : "Detenido"));
+            telemetry.addData("MotorHex2 (Flechas)", dpadLeft ? "Adelante" : (dpadRight ? "Atras" : "Detenido"));
+            telemetry.addData("MotorUltra (Cuadrado/Circulo)", ultraForward ? "Directo" : (ultraReverse ? "Inverso" : "Detenido"));
+            telemetry.addData("Posición Servo 2", "%.4f", servomotor2.getPosition());
+            telemetry.addData("Posición Servo 3", "%.4f", servomotor3.getPosition());
+            telemetry.update();
+        }
+    }
+}
