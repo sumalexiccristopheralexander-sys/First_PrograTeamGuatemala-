@@ -1,0 +1,80 @@
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+
+
+
+@TeleOp(name = "Expansor")
+public class firstP2 extends LinearOpMode {
+
+    private Servo servomotor2, servomotor3;
+    
+    //Posicion servos (adelante y atras)
+    private static final double SERVO_ADELANTE = 1.0;
+    private static final double SERVO_ATRAS = 0.0;
+    private static final double SERVO_PARAR = 0.5;
+
+    
+    @Override
+    public void runOpMode() throws InterruptedException {
+        // Inicialización de hardware 
+        servomotor2 = hardwareMap.get(Servo.class, "servomotor2");
+        servomotor3 = hardwareMap.get(Servo.class, "servomotor3");
+
+        // Iniciar servos
+        servomotor2.setPosition(SERVO_PARAR);
+        servomotor3.setPosition(SERVO_PARAR);
+
+
+        telemetry.addLine("Sistema listo. Pulse PLAY para iniciar.");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            // Lectura de joysticks
+            float powerY = -gamepad1.left_stick_y;
+            float powerX = gamepad1.left_stick_x;
+            float rot = gamepad1.right_stick_x;
+
+            // Lectura de botones
+            boolean rb = gamepad2.right_bumper;
+            boolean lb = gamepad2.left_bumper;
+            float l2 = gamepad2.left_trigger;
+            float r2 = gamepad2.right_trigger;
+
+            
+            // Servo 1 y 2
+            if (lb) {
+                servomotor3.setPosition(SERVO_ATRAS);
+
+            } else if (rb) {
+                servomotor2.setPosition(SERVO_ADELANTE);
+
+            } if (l2 > 0){
+                servomotor3.setPosition(Servo_ADELANTE);
+            } if (r2 > 0){
+                servomotor2.setPosition(Servo_ATRAS);
+            } if (lb && rb){
+                servomotor3.setPosition(Servo_ATRAS0);
+                servomotor2.setPosition(Servo_ADELANTE);
+            } if ((l2 && r2) > 0){
+                sermovotor3.setPosition(Servomotor_ADELANTE);
+                sevomotror2.setPosition(Servomotor_ATRAS)
+            }else {
+                servomotor2.setPosition(SERVO_PARAR);
+                servomotor3.setPosition(SERVO_PARAR);
+            }
+            
+            
+
+            telemetry.addData("Posición Servo 2", "%.4f", servomotor2.getPosition());
+            telemetry.addData("Posición Servo 3", "%.4f", servomotor3.getPosition());
+            telemetry.update();
+        }
+    }
+}
