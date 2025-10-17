@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.Range;
 
 
@@ -16,8 +15,9 @@ public class firstP2 extends LinearOpMode {
     private DcMotorEx rightFront, rightBack, leftFront, leftBack;
 
     // Actuadores adicionales
-    private DcMotorEx motorHex, motorHex2, motorUltra;
-    private Servo servomotor1; 
+    private DcMotorEx motorHex;
+    private DcMotorEx motorHex2;
+    private DcMotorEx motorUltra;
     private Servo servomotor2, servomotor3;
 
     // Variables de estado para los motores
@@ -125,13 +125,10 @@ public class firstP2 extends LinearOpMode {
 
             if (hexToggleForward) {
                 motorHex.setPower(-HEX_POWER);
-                servomotor1.setPosition(SERVO_ATRAS);
             } else if (hexToggleReverse) {
                 motorHex.setPower(HEX_POWER);
-                servomotor1.setPosition(SERVO_ADELANTE);
             } else {
                 motorHex.setPower(0);
-                servomotor1.setPosition(SERVO_PARAR);
             }
 
             //Rope
