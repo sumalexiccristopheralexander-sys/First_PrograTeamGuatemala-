@@ -73,6 +73,7 @@ public class firstP2 extends LinearOpMode {
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Iniciar servos
+        servomotor1.setPosition(SERVO_PARAR);
         servomotor2.setPosition(SERVO_PARAR);
         servomotor3.setPosition(SERVO_PARAR);
 
