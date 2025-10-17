@@ -126,11 +126,11 @@ public class firstP2 extends LinearOpMode {
             }
 
             if (hexToggleForward) {
-                motorHex.setPower(-HEX_POWER);
-                servomotor1.setPosition(SERVO_ATRAS);
-            } else if (hexToggleReverse) {
                 motorHex.setPower(HEX_POWER);
                 servomotor1.setPosition(SERVO_ADELANTE);
+            } else if (hexToggleReverse) {
+                motorHex.setPower(-HEX_POWER);
+                servomotor1.setPosition(SERVO_ATRAS);
             } else {
                 motorHex.setPower(0);
                 servomotor1.setPosition(SERVO_PARAR);
