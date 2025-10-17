@@ -18,6 +18,7 @@ public class firstP2 extends LinearOpMode {
     private DcMotorEx motorHex;//Rotor(recolector)
     private DcMotorEx motorHex2;//Rope
     private DCMotorEx motorUltra;// acelerator 
+    private Servo servomotor1;//Recolector
     private Servo servomotor2, servomotor3;//mecanismo recolector (Extensores)
 
     // Variables de estado para los motores
@@ -73,6 +74,7 @@ public class firstP2 extends LinearOpMode {
         // Iniciar servos
         servomotor2.setPosition(SERVO_PARAR);//Inicializar servos en modo "Quietos"
         servomotor3.setPosition(SERVO_PARAR);
+        servomotor1.setPosition(SERVO_PARAR);
 
 
         telemetry.addLine("[OmniWheelsTest] Sistema listo. Pulse PLAY para iniciar.");
@@ -128,10 +130,13 @@ public class firstP2 extends LinearOpMode {
 
             if (hexToggleForward) {//Si la función es verdadera
                 motorHex.setPower(HEX_POWER);//Se activa motor/recolector(sentido horario)
+                servomotor1.setPosition(SERVO_ADELANTE);
             } else if (hexToggleReverse) {//Si la función es verdadera
                 motorHex.setPower(-HEX_POWER);//Se activa motor/recolector(sentido antihorario)
+                servomotor1.setPosition(SERVO_ATRAS);
             } else {
                 motorHex.setPower(0);//De lo contrario permanecer "quieto"
+                servomotor1.setPosition(SERVO_PARAR);
             }
 
             //Rope
