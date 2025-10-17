@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.Range;
 
 
@@ -117,7 +116,7 @@ public class firstP2 extends LinearOpMode {
             leftFront.setPower(Range.clip(LF, -1, 1));//Gira hacia atrás
             leftBack.setPower(Range.clip(LB, -1, 1));//Gira hacia adelante
 
-            // Control de motorHex y servomotor1 
+            // Control de motorHex (Recolector)
             if (x && !prevX) { //Si se presiona x que se active(sin importar si sueltan el boton) Recolectar pelotas
                 hexToggleForward = !hexToggleForward;//Función, establecer que gire el recolector/sentido horario (Verdadero/Movimiento)
                 hexToggleReverse = false;//Función, establecer que gire el recolector/sentido antiohorario (Falso/Quieto) para evitar conflictos
