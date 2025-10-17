@@ -14,6 +14,7 @@ public class firstP2 extends LinearOpMode {
 
     // Actuadores adicionales
     private DcMotorEx motorHex;
+    private Servo servomotor1;
     private Servo servomotor2, servomotor3;
 
     // Variables de estado para los motores
@@ -44,6 +45,7 @@ public class firstP2 extends LinearOpMode {
         motorHex.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Iniciar servos
+        servomotor1.setPosition(SERVO_PARAR);
         servomotor2.setPosition(SERVO_PARAR);
         servomotor3.setPosition(SERVO_PARAR);
 
@@ -74,11 +76,14 @@ public class firstP2 extends LinearOpMode {
             }
 
             if (hexToggleForward) {
-                motorHex.setPower(-HEX_POWER);
-            } else if (hexToggleReverse) {
                 motorHex.setPower(HEX_POWER);
+                servomotor1.setPosition(SERVO_ADELANTE);
+            } else if (hexToggleReverse) {
+                motorHex.setPower(-HEX_POWER);
+                servomotor1.setPosition(SERVO_ATRAS);
             } else {
                 motorHex.setPower(0);
+                servomotor1.setPosition(SERVO_PARAR);
             }
             
             // Servo 1 y 2
