@@ -22,6 +22,7 @@ public class firstP2 extends LinearOpMode {
 
     // Constantes de potencia
     private static final double HEX2_POWER = 1.0;
+    private static final double Hex_Power = 0.4;
 
 
     
