@@ -1,0 +1,86 @@
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+
+
+
+@TeleOp(name = "Acelerator")
+public class firstP2 extends LinearOpMode {
+
+
+    // Actuadores adicionales
+    private DcMotorEx motorUltra;
+
+    // Variables de estado para los motores
+    private boolean ultraForward = false;
+    private boolean ultraReverse = false;
+   
+    
+    // Variables para detección de flancos (anti-rebote)
+    private boolean prevX, prevTriangle, prevSquare, prevCircle, prevCircle2, prevSquare2;
+
+    private static final double ULTRA_POWER = 1.0;
+  
+
+    
+    @Override
+    public void runOpMode() throws InterruptedException {
+        // Inicialización de hardware
+        motorUltra = hardwareMap.get(DcMotorEx.class, "motorUltra");
+
+        motorUltra.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        telemetry.addLine("[OmniWheelsTest] Sistema listo. Pulse PLAY para iniciar.");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+
+            // Lectura de botones
+            boolean square = gamepad1.square;
+            boolean circle = gamepad1.circle;
+
+
+            // acelerator xd
+            if (square && !prevSquare) {
+                if (ultraForward) {
+                    ultraForward = false;
+                } else {
+                    ultraForward = true;
+                    ultraReverse = false;
+                }
+            }
+            if (circle && !prevCircle) {
+                if (ultraReverse) {
+                    ultraReverse = false;
+                } else {
+                    ultraReverse = true;
+                    ultraForward = false;
+                }
+            }
+            if (ultraForward) {
+                motorUltra.setPower(ULTRA_POWER);
+            } else if (ultraReverse) {
+                motorUltra.setPower(-ULTRA_POWER);
+            } else {
+                motorUltra.setPower(0.0);
+            }
+            
+            
+            prevX = x;
+            prevTriangle = triangle;
+            prevSquare = square;
+            prevCircle = circle;
+
+            
+            
+            telemetry.addData("MotorUltra (Cuadrado/Circulo)", ultraForward ? "Directo" : (ultraReverse ? "Inverso" : "Detenido"));
+            telemetry.update();
+        }
+    }
+}
