@@ -55,16 +55,16 @@ public class firstP2 extends LinearOpMode {
             } else if (rb) {
                 servomotor2.setPosition(SERVO_ADELANTE);
 
-            } if (l2 > 0){
-                servomotor3.setPosition(Servo_ADELANTE);
-            } if (r2 > 0){
-                servomotor2.setPosition(Servo_ATRAS);
-            } if (lb && rb){
-                servomotor3.setPosition(Servo_ATRAS0);
-                servomotor2.setPosition(Servo_ADELANTE);
-            } if ((l2 && r2) > 0){
-                sermovotor3.setPosition(Servomotor_ADELANTE);
-                sevomotror2.setPosition(Servomotor_ATRAS)
+            } else if (l2 > 0){
+                servomotor3.setPosition(SERVO_ADELANTE);
+            } else if (r2 > 0){
+                servomotor2.setPosition(SERVO_ATRAS);
+            } else if (lb && rb){
+                servomotor3.setPosition(SERVO_ATRAS0);
+                servomotor2.setPosition(SERVO_ADELANTE);
+            } else if ((l2 && r2) > 0){
+                servomotor3.setPosition(SERVO_ADELANTE);
+                servomotor2.setPosition(SERVO_ATRAS)
             }else {
                 servomotor2.setPosition(SERVO_PARAR);
                 servomotor3.setPosition(SERVO_PARAR);
