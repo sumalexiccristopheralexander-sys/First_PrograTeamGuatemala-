@@ -36,7 +36,7 @@ public class firstP2 extends LinearOpMode {
     private static final double HEX_POWER = 1.0;
     private static final double HEX2_POWER = 1.0;
     private static final double HEX_STAT = 0;
-    private static final double ULTRA_POWER = 0.8;
+    private static final double ULTRA_POWER = 1.0;
     private static final double SERVO_CONTINUOUS_POWER = 1.0;
 
     private static final double Hex_Power = 0.4;
@@ -62,11 +62,6 @@ public class firstP2 extends LinearOpMode {
         servomotor1 = hardwareMap.get(Servo.class, "servomotor1"); 
         servomotor2 = hardwareMap.get(Servo.class, "servomotor2");
         servomotor3 = hardwareMap.get(Servo.class, "servomotor3");
-
-        // Configuración de comportamiento en cero
-        motorHex.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorHex2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorUltra.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Configuración de dirección
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -98,7 +93,7 @@ public class firstP2 extends LinearOpMode {
             boolean lb = gamepad2.left_bumper;
             boolean dpadLeft = gamepad2.dpad_left;
             boolean dpadRight = gamepad2.dpad_right;
-            boolean circle2 = gamead2.circle;
+            boolean circle2 = gamepad2.circle;
             boolean square2 = gamepad2.square;
             float l2 = gamepad2.left_trigger;
             float r2 = gamepad2.right_trigger;
@@ -201,16 +196,16 @@ public class firstP2 extends LinearOpMode {
             } else if (rb) {
                 servomotor2.setPosition(SERVO_ADELANTE);
 
-            } if (l2 > 0){
-                servomotor3.setPosition(Servo_ADELANTE);
-            } if (r2 > 0){
-                servomotor2.setPosition(Servo_ATRAS);
-            } if (lb && rb){
-                servomotor3.setPosition(Servo_ATRAS0);
-                servomotor2.setPosition(Servo_ADELANTE);
-            } if ((l2 && r2) > 0){
-                sermovotor3.setPosition(Servomotor_ADELANTE);
-                sevomotror2.setPosition(Servomotor_ATRAS)
+            } else if (l2 > 0){
+                servomotor3.setPosition(SERVO_ADELANTE);
+            } else if (r2 > 0){
+                servomotor2.setPosition(SERVO_ATRAS);
+            } else if (lb && rb){
+                servomotor3.setPosition(SERVO_ATRAS);
+                servomotor2.setPosition(SERVO_ADELANTE);
+            } else if ((l2 && r2) > 0){
+                sermovotor3.setPosition(SERVO_ADELANTE);
+                servomotor2.setPosition(SERVO_ATRAS)
             }else {
                 servomotor2.setPosition(SERVO_PARAR);
                 servomotor3.setPosition(SERVO_PARAR);
