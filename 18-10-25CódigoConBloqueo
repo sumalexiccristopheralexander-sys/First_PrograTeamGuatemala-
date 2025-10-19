@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "OmniDrive_2Controllers_FullEncoder", group = "Competition")
-public class FirstP2_Optimized extends LinearOpMode {
+@TeleOp(name = "Movimiento dos controles", group = "Competition")
+public class firstP2 extends LinearOpMode {
 
     // Motores de tracción (Omnidireccional)
     private DcMotorEx rightFront, rightBack, leftFront, leftBack;
